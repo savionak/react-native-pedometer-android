@@ -1,6 +1,6 @@
 import { NativeModules } from 'react-native'
 
-type Pedometer = {
+type PedometerType = {
   isSupported(): boolean
   start(periodMs: number): boolean
   stop(): void
@@ -10,4 +10,4 @@ type Pedometer = {
 
 const { Pedometer } = NativeModules
 
-export default Pedometer as Pedometer
+export default Pedometer as PedometerType
