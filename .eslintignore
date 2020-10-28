@@ -1,0 +1,9 @@
+# folders
+node_modules
+android
+ios
+lib
+
+# config files
+.eslintrc.js
+babel.config.js
