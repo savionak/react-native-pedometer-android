@@ -5,8 +5,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.hardware.TriggerEvent;
-import android.hardware.TriggerEventListener;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -16,19 +14,27 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-public class StepCounter extends TriggerEventListener implements SensorEventListener {
+enum State {
+  Listening,
+  Single,
+  Stopped
+}
+
+public class StepCounter implements SensorEventListener {
 
   public static final String STEP_COUNTER_EVENT_NAME = "StepCounter";
-  public static final String SINGLE_STEP_COUNTER_EVENT_NAME = "SingleStepCounter";
 
   private final ReactApplicationContext mReactContext;
   private final SensorManager mSensorManager;
   private final Sensor mStepCounter;
 
+  private State mState;
+
   public StepCounter(ReactApplicationContext reactContext) {
     mReactContext = reactContext;
     mSensorManager = (SensorManager) reactContext.getSystemService(Context.SENSOR_SERVICE);
     mStepCounter = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+    mState = State.Stopped;
   }
 
   public boolean isSupported() {
@@ -39,33 +45,33 @@ public class StepCounter extends TriggerEventListener implements SensorEventList
     stop();
     int periodUs = periodMs * 1000;
     mSensorManager.registerListener(this, mStepCounter, periodUs);
+    mState = State.Listening;
+  }
+
+  public void single() {
+    if (mState == State.Stopped) {
+      mSensorManager.registerListener(this, mStepCounter, SensorManager.SENSOR_DELAY_FASTEST);
+      mState = State.Single;
+    }
   }
 
   public void stop() {
-    mSensorManager.unregisterListener(this, mStepCounter);
+    if (mState != State.Stopped) {
+      mSensorManager.unregisterListener(this, mStepCounter);
+      mState = State.Stopped;
+    }
   }
 
   @Override
   public void onSensorChanged(SensorEvent sensorEvent) {
     handleSensorValues(sensorEvent.values, STEP_COUNTER_EVENT_NAME);
+    if (mState == State.Single)
+      stop();
   }
 
   @Override
   public void onAccuracyChanged(Sensor sensor, int i) {
     // do nothing
-  }
-
-  public void single() {
-    mSensorManager.requestTriggerSensor(this, mStepCounter);
-  }
-
-  public void cancelSingle() {
-    mSensorManager.cancelTriggerSensor(this, mStepCounter);
-  }
-
-  @Override
-  public void onTrigger(TriggerEvent sensorEvent) {
-    handleSensorValues(sensorEvent.values, SINGLE_STEP_COUNTER_EVENT_NAME);
   }
 
   private void handleSensorValues(float[] sensorValues, String eventName) {
