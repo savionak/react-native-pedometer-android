@@ -11,3 +11,6 @@ type PedometerType = {
 const { Pedometer } = NativeModules
 
 export default Pedometer as PedometerType
+
+export const StepCounterEvent = "StepCounter";
+export const SingleStepCounterEvent = "SingleStepCounter";
