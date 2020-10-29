@@ -1,5 +1,6 @@
 package com.savionak.reactnative.pedometer;
 
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -19,17 +20,20 @@ public class PedometerModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public boolean isSupported() {
+  public void isSupported(Promise promise) {
     if (mStepCounter == null)
       mStepCounter = new StepCounter(mReactContext);
-    return mStepCounter.isSupported();
+    promise.resolve(mStepCounter.isSupported());
   }
 
   @ReactMethod
-  public boolean start(int periodMs) {
+  public void start(int periodMs, Promise promise) {
     if (mStepCounter == null)
       mStepCounter = new StepCounter(mReactContext);
-    return mStepCounter.start(periodMs);
+    boolean supported = mStepCounter.isSupported();
+    if (supported)
+      mStepCounter.start(periodMs);
+    promise.resolve(supported);
   }
 
   @ReactMethod
@@ -39,10 +43,13 @@ public class PedometerModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public boolean single() {
+  public void single(Promise promise) {
     if (mStepCounter == null)
       mStepCounter = new StepCounter(mReactContext);
-    return mStepCounter.single();
+    boolean supported = mStepCounter.isSupported();
+    if (supported)
+      mStepCounter.single();
+    promise.resolve(supported);
   }
 
   @ReactMethod

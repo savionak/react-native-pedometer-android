@@ -35,14 +35,10 @@ public class StepCounter extends TriggerEventListener implements SensorEventList
     return (mStepCounter != null);
   }
 
-  public boolean start(int periodMs) {
-    boolean status = isSupported();
-    if (status) {
-      stop();
-      int periodUs = periodMs * 1000;
-      mSensorManager.registerListener(this, mStepCounter, periodUs);
-    }
-    return status;
+  public void start(int periodMs) {
+    stop();
+    int periodUs = periodMs * 1000;
+    mSensorManager.registerListener(this, mStepCounter, periodUs);
   }
 
   public void stop() {
@@ -56,14 +52,11 @@ public class StepCounter extends TriggerEventListener implements SensorEventList
 
   @Override
   public void onAccuracyChanged(Sensor sensor, int i) {
+    // do nothing
   }
 
-  public boolean single() {
-    boolean status = isSupported();
-    if (status) {
-      mSensorManager.requestTriggerSensor(this, mStepCounter);
-    }
-    return status;
+  public void single() {
+    mSensorManager.requestTriggerSensor(this, mStepCounter);
   }
 
   public void cancelSingle() {

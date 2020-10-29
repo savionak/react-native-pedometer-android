@@ -1,10 +1,10 @@
 import { NativeModules } from 'react-native'
 
 type PedometerType = {
-  isSupported(): boolean
-  start(periodMs: number): boolean
+  isSupported(): Promise<boolean>
+  start(periodMs: number): Promise<boolean>
   stop(): void
-  single(): boolean
+  single(): Promise<boolean>
   cancelSingle(): void
 }
 
