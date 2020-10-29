@@ -42,15 +42,6 @@ public class PedometerModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void single(Promise promise) {
-    StepCounter stepCounter = acquireStepCounter();
-    boolean supported = stepCounter.isSupported();
-    if (supported)
-      stepCounter.single();
-    promise.resolve(supported);
-  }
-
-  @ReactMethod
   public void stop() {
     StepCounter stepCounter = acquireStepCounter(false);
     if (stepCounter != null)

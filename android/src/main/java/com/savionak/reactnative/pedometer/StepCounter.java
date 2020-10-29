@@ -16,7 +16,6 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 enum State {
   Listening,
-  Single,
   Stopped
 }
 
@@ -44,15 +43,8 @@ public class StepCounter implements SensorEventListener {
   public void start(int periodMs) {
     stop();
     int periodUs = periodMs * 1000;
-    mSensorManager.registerListener(this, mStepCounter, periodUs);
+    mSensorManager.registerListener(this, mStepCounter, periodUs, periodUs);
     mState = State.Listening;
-  }
-
-  public void single() {
-    if (mState == State.Stopped) {
-      mSensorManager.registerListener(this, mStepCounter, SensorManager.SENSOR_DELAY_FASTEST);
-      mState = State.Single;
-    }
   }
 
   public void stop() {
@@ -65,8 +57,6 @@ public class StepCounter implements SensorEventListener {
   @Override
   public void onSensorChanged(SensorEvent sensorEvent) {
     handleSensorValues(sensorEvent.values, STEP_COUNTER_EVENT_NAME);
-    if (mState == State.Single)
-      stop();
   }
 
   @Override
