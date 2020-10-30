@@ -1,5 +1,9 @@
 package com.savionak.reactnative.pedometer;
 
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -49,8 +53,8 @@ public class PedometerModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void showCurrentStepsToast() {
-    StepCounterService.startActionTrigger(mReactContext, 0);
+  public void getCurrentSteps(Promise promise) {
+    StepCounterService.startActionTrigger(mReactContext, promise);
   }
 
   private StepCounter acquireStepCounter() {
