@@ -3,9 +3,7 @@
   package="com.savionak.reactnative.pedometer">
 
   <application>
-    <service
-      android:name=".StepCounterService"
-      android:exported="false"></service>
+    <service android:name=".StepCounterService" />
   </application>
 
 </manifest>

@@ -1,8 +1,11 @@
 package com.savionak.reactnative.pedometer;
 
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.ResultReceiver;
+import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +21,25 @@ public class PedometerModule extends ReactContextBaseJavaModule {
 
   private StepCounter mStepCounter;
   private ReactApplicationContext mReactContext;
+
+  private boolean isServiceRunning = false;
+  private boolean isServiceBound = false;
+
+  private StepCounterService mStepCounterService;
+  private ServiceConnection mConnection = new ServiceConnection() {
+    @Override
+    public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+      StepCounterService.StepCounterServiceBinder binder =
+        (StepCounterService.StepCounterServiceBinder) iBinder;
+      mStepCounterService = binder.getService();
+      isServiceBound = true;
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName componentName) {
+      isServiceBound = false;
+    }
+  };
 
   public PedometerModule(ReactApplicationContext reactContext) {
     super(reactContext);
@@ -53,8 +75,40 @@ public class PedometerModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
+  public void startService(Promise promise) {
+    StepCounter stepCounter = acquireStepCounter();
+    boolean supported = stepCounter.isSupported();
+    if (supported) {
+      Activity activity = mReactContext.getCurrentActivity();
+      Intent intent = new Intent(activity, StepCounterService.class);
+      if (activity != null) {
+        activity.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        activity.startService(intent);
+        isServiceRunning = true;
+      }
+    }
+    promise.resolve(supported);
+  }
+
+  @ReactMethod
+  public void stopService(Promise promise) {
+    Activity activity = mReactContext.getCurrentActivity();
+    Intent intent = new Intent(activity, StepCounterService.class);
+    if (activity != null) {
+      if (isServiceRunning && isServiceBound) {
+        mStepCounterService.stopTracking();
+        isServiceBound = false;
+        activity.unbindService(mConnection);
+      }
+      isServiceRunning = false;
+      activity.stopService(intent);
+    }
+    promise.resolve(true);
+  }
+
+  @ReactMethod
   public void getCurrentSteps(Promise promise) {
-    StepCounterService.startActionTrigger(mReactContext, promise);
+    promise.resolve(mStepCounterService.getSteps());
   }
 
   private StepCounter acquireStepCounter() {
