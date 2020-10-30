@@ -48,6 +48,11 @@ public class PedometerModule extends ReactContextBaseJavaModule {
       stepCounter.stop();
   }
 
+  @ReactMethod
+  public void showCurrentStepsToast() {
+    StepCounterService.startActionTrigger(mReactContext, 0);
+  }
+
   private StepCounter acquireStepCounter() {
     return acquireStepCounter(true);
   }
