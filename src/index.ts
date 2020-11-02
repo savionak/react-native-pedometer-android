@@ -4,6 +4,8 @@ type PedometerType = {
   isSupported(): Promise<boolean>
   start(periodMs: number): Promise<boolean>
   stop(): void
+  startService(sensorDelayMs: number): void
+  stopService(sensorDelayMs: number): void
   getCurrentSteps(): Promise<number>
 }
 

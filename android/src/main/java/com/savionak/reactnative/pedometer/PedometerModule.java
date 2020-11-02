@@ -53,8 +53,25 @@ public class PedometerModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
+  public void startService(int sensorDelayMs) {
+    StepCounterService.start(mReactContext, sensorDelayMs * 1000);
+  }
+
+  @ReactMethod
+  public void stopService() {
+    StepCounterService.stop(mReactContext);
+  }
+
+  @ReactMethod
   public void getCurrentSteps(Promise promise) {
-    StepCounterService.startActionTrigger(mReactContext, promise);
+    ResultReceiver resultReceiver = new ResultReceiver(new Handler()) {
+      @Override
+      protected void onReceiveResult(int resultCode, Bundle resultData) {
+        final int steps = resultData.getInt(StepCounterService.EXTRA_STEPS, -1);
+        promise.resolve(steps);
+      }
+    };
+    StepCounterService.getCurrentSteps(mReactContext, resultReceiver);
   }
 
   private StepCounter acquireStepCounter() {
