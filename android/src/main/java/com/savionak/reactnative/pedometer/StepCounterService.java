@@ -43,7 +43,7 @@ public class StepCounterService extends IntentService {
     if (intent != null) {
       final String action = intent.getAction();
       final ResultReceiver resultReceiver = (ResultReceiver) intent.getParcelableExtra(EXTRA_PARAM_RESULT_RECEIVER);
-      if (ACTION_TRIGGER.equals(action)) {
+      if (ACTION_TRIGGER.equals(action) && resultReceiver != null) {
         handleActionTrigger(resultReceiver);
       }
     }
@@ -57,7 +57,7 @@ public class StepCounterService extends IntentService {
       public void onTrigger(TriggerEvent triggerEvent) {
         final float value = triggerEvent.values[0];
         final Bundle b = new Bundle();
-        b.putFloat(STEPS_RESULT, value);
+        b.putInt(STEPS_RESULT, Math.round(value));
         resultReceiver.send(0, b);
       }
     }, stepCounter);
