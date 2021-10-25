@@ -5,7 +5,7 @@ React Native wrapper for Android step counter
 ## Installation
 
 ```
-npm install git+https://github.com/SVss/react-native-pedometer-android.git
+npm install git+https://github.com/savionak/react-native-pedometer-android.git
 ```
 
 ## Usage
